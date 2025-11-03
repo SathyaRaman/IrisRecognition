@@ -1,7 +1,7 @@
 # ag5003_sr4213_ssd2184 Iris Recognition Project
 
 ## Project Overview
-This project implements an **iris recognition pipeline** based on classical methods from the literature, including Ma et al. (2003) and Daugman's Rubber Sheet Model. The pipeline processes iris images from the CASIA Iris Image Database (version 1.0) and performs both **identification** and **verification** tasks.  
+This project implements an **iris recognition pipeline** inspired by Ma et al. (2003). The pipeline processes iris images from the CASIA Iris Image Database (version 1.0) and performs both **identification** and **verification** tasks.  
 
 The main steps of the pipeline are:
 
@@ -44,7 +44,20 @@ The main steps of the pipeline are:
 6. **Performance Evaluation**  
    - **Correct Recognition Rate (CRR)**: shows identification performance per distance metric.  
    - **ROC Curves** and **Equal Error Rate (EER)**: shows verification performance.  
-   - All tables and figures are automatically saved as images.  
+   - All tables and figures are automatically saved as images.
+  
+7. **PreProcessing.py**
+   - Defines helper functions to run the pipeline.
+   - complete_rotations: returns a list of rotated images to account for eye rotation. Uses circular horizontal shifts for rotation invariance.
+   - load_iris_images: helps process the input data from the CASIA database by iterating through the directory and returning sorted paths to each image.
+  
+8. **Iris Recognition main functionn**
+   - The main function of the code.
+   - Calls the other functions (localization, image enhancement, feature extraction, iris matching, performance evaluation.
+   - Splits dataset into training and test data (session 1 / folder 1 = train and session 2 / folder 2 = test).
+   - Calls the function pipeline in order for training and test images.
+   - Calls rotation function to rotate images when performing matching on the test dataset only.
+   - There are no returns, but outputs CRR and ROC results in table and graph format after calling.
 
 ---
 
