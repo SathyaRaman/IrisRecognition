@@ -14,7 +14,10 @@ The main steps of the pipeline are:
    - Output: pupil circle `(x, y, r)` and iris circle `(x, y, r)`  
 
 **Iris Normalization**  
-   - Maps the iris from Cartesian coordinates to polar coordinates using **Daugman's Rubber Sheet Model**.  
+   - Maps the iris from Cartesian coordinates to polar coordinates using **Daugman's Rubber Sheet Model**.
+   - Uses the pupil (x, y, r) and iris (x, y, r) circles to define boundaries.
+   - Performs linear interpolation between the pupil and iris boundaries to unwrap the iris.
+   - Uses cv.remap() to generate the polar image and normalizes intensity values to 0–255.
    - Produces a fixed-size normalized iris image suitable for feature extraction.  
 
 **Image Enhancement**  
