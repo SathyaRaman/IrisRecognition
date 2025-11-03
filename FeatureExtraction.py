@@ -32,13 +32,18 @@ def feature_extraction(enhanced_iris):
   f = 1 / delta_y
 
   #the width/height of the filter kernel in pixels
+  #used this number as the size of the spatial kernel pixel (how many pixels width/height will the kernel be)
+  #r is the is the radius (half-size) of the filter kernel.
   ksize = 35
   r = int(np.floor(ksize/2))
 
   #generate grid for kernel coordinates
   y, x = np.mgrid[-r:r+1, -r:r+1].astype(np.float32)
-  kernels = [] #store filter kernels fo each channel
+  #store filter kernels fo each channel
+  kernels = []
 
+  #iterate through every channel to calculate the kernel for channel 1 and 2
+  #the channel defines the delta values that will be used to calculate the modified Gabor filter
   for channel in range(len(i)):
     delta_x = delta_xs[channel]
 
