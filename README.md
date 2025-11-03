@@ -1,7 +1,7 @@
 # ag5003_sr4213_ssd2184 Iris Recognition Project
 
 ## Project Overview
-This project implements an **iris recognition pipeline** inspired by Ma et al. (2003). The pipeline processes iris images from the CASIA Iris Image Database (version 1.0) and performs both **identification** and **verification** tasks.  
+This project implements an **iris recognition pipeline** inspired by Ma et al. (2003). The pipelinand performs both identification (classifying each iris to a known subject) and verification (evaluating match thresholds using ROC analysis) tasks.
 
 The main steps of the pipeline are:
 
