@@ -84,10 +84,9 @@ def ROC_Result(all_distances, y_test, class_labels, metrics):
     - class_labels: distances calculated for test samples
     - metrics: distance measures we want included, currently set to only cosine in main, can include l1 and l2 as well
     """
-    print("\nTable 4: False Match and False Non-match Rates with Paper Thresholds")
-    paper_thresholds = [0.446, 0.472, 0.502]
+    print("\nTable 4: False Match and False Non-match Rates")
 
-    #get thresholds
+    #set up table
     table4_rows = [["Metric", "Threshold", "False Match Rate (%)", "False Non-match Rate (%)"]]
 
     plt.figure(figsize=(6.5, 4.8))
@@ -96,39 +95,61 @@ def ROC_Result(all_distances, y_test, class_labels, metrics):
     #can add other metrics to input if that is needed
     for metric in metrics:
         D = all_distances[metric]
-        genuine, impostor = [], []
+        authorized, impostor = [], []
 
-        #get genuine and impostor distances
+        #get authorized and impostor distances
         for i, true_label in enumerate(y_test):
             idx = np.where(class_labels == true_label)[0][0]
-            genuine.append(D[i, idx])
+            authorized.append(D[i, idx])
             impostor.extend(D[i, np.arange(len(class_labels)) != idx])
 
-        genuine = np.array(genuine)
+        authorized = np.array(authorized)
         impostor = np.array(impostor)
 
-        #compute ROC curve for visualization
-        #calculate the FMR and FNMR using imposter and genuine distances
-        #the below is for the continuous curve in figure 11
-        thresholds = np.linspace(genuine.min(), impostor.max(), 200)
-        FMR = [(impostor <= t).mean() * 100 for t in thresholds]
-        FNMR = [(genuine > t).mean() * 100 for t in thresholds]
-        plt.plot(FMR, FNMR, label=metric.upper())
+        #boolean to determine if the metric is similarity-based or distance-based
+        #if the authorized mean is higher than imposter mean, then the metric is similarity (cosine), else L1 and L2
+        similarity = np.mean(authorized) > np.mean(impostor) 
+        
+        # automatically select 3 thresholds
+        if similarity: #for cosine similarity
+            low = np.percentile(impostor, 10) #low threshold is for the 10th percentile of imposters
+            mid = np.median((authorized.mean(), impostor.mean())) # the mean of the authorized and imposters
+            high = np.percentile(authorized, 90) # high threshold is the 90th percentile of authorized
+        else: #for L1 and L2 metrics
+            low = np.percentile(authorized, 90)  #low threshold is for 90th percentile of authorized
+            mid = (authorized.mean() + impostor.mean()) / 2  #the mean of the authorized and importers
+            high = np.percentile(impostor, 10) # high threshold is for the 10th percentile of imposters
 
-        #compute FMR/FNMR at the paper thresholds (0.446, 0.472, 0.502)  
-        for t in paper_thresholds:
-            fmr = (impostor <= t).mean() * 100
-            fnmr = (genuine > t).mean() * 100
+        #compute ROC curve for visualization
+        #calculate the FMR and FNMR using imposter and authorized distances
+        #the below is for the continuous curve in figure 11
+        thresholds = sorted([low, mid, high])
+        FMR_list, FNMR_list = [], []
+        for t in thresholds:
+            if similarity: #for cosine similarity 
+                fmr = (impostor >= t).mean() * 100 #false matches are for imposters that are above the threshold
+                fnmr = (authorized < t).mean() * 100 #false nonmatches are for authorized below the threshold 
+            else: #for L1 and L2
+                fmr = (impostor <= t).mean() * 100 #false matches are for imposters that are below the threshold 
+                fnmr = (authorized > t).mean() * 100 #false nonmatches are for the authorized above the threshold 
+
+            FMR_list.append(fmr)
+            FNMR_list.append(fnmr)
+            #append the thresholds to the table
             table4_rows.append([
                 metric.upper(),
                 f"{t:.3f}",
                 f"{fmr:.3f}",
                 f"{fnmr:.3f}"
             ])
+        #plot the ROC curve
+        plt.plot(FMR_list, FNMR_list, marker='o', lw=1.8, label=f"{metric.upper()} (ROC)")
 
     #print table
-    for row in table4_rows:
-        print("\t".join(row))
+    print("Metric Threshold FMR(%) FNMR(%)")
+    for row in table4_rows[1:]:
+        print(*row)
+
 
     #save table 4 visualization
     fig, ax = plt.subplots(figsize=(7, 3))
@@ -136,19 +157,18 @@ def ROC_Result(all_distances, y_test, class_labels, metrics):
     tbl = ax.table(cellText=table4_rows, loc='center', cellLoc='center')
     tbl.auto_set_font_size(False)
     tbl.set_fontsize(9)
-    ax.set_title("Table 4: FMR / FNMR at Paper Thresholds", fontsize=10, pad=8)
+    ax.set_title("Table 4: FMR / FNMR", fontsize=10, pad=8)
     plt.tight_layout()
-    plt.savefig("Table4_PaperThresholds.png", dpi=300)
+    plt.savefig("Table4_.png", dpi=300)
     plt.close(fig)
 
     #save ROC Curve (Figure 11)
+    plt.xscale('log') #log scale the x axis, as done in the Ma paper
     plt.xlabel("False Match Rate (%)")
     plt.ylabel("False Non-match Rate (%)")
-    plt.title("Figure 11: ROC Curves (Verification Mode)")
+    plt.title("Figure 11: ROC Curves")
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig("Figure11_ROC_Curves_PaperThresholds.png", dpi=300)
-    plt.close()
     plt.savefig("Figure11_ROC_Curves.png", dpi=300)
     plt.close()
