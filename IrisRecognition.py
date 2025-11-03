@@ -134,7 +134,8 @@ def IrisRecognition(dataset_path):
 
     #Run step 6: performance evaluation to show CRR and ROC curve
     CRR_Result(y_test, y_pred, X_train, y_train, X_test_groups)
-    ROC = ROC_Result(all_distances, y_test, class_labels, metrics=("l1","l2","cosine"))
+    metrics = ["cosine"]
+    ROC = ROC_Result(all_distances, y_test, class_labels, metrics)
 
 if __name__ == "__main__":
     dataset_path = "datasets/CASIA_Iris/CASIA Iris Image Database (version 1.0)" 
