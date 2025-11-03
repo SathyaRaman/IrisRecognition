@@ -23,9 +23,18 @@ The main steps of the pipeline are:
    - Ensures robust normalization of intensity values.  
 
 4. **Feature Extraction**  
-   - Implements **Ma et al.'s spatial filters** for texture analysis.  
-   - Extracts features using mean and average absolute deviation of filtered blocks.  
-   - Produces a **1D feature vector** per iris sample.  
+   - Implements **Ma et al.'s feature extraction procedure** after the generation of a normalized and enhanced iris image.
+   - Run two different spatial filters with different (delta x, delta y) values, (3, 1.5) and (4.5, 1.5)
+   - Use the defined filter created by the paper to generated a modified Gabor filter with modulating sinusoidal function.
+   - The spatial frequency (f) is defined as 1/delta_y and the filter kernel size is set to 35×35 pixels.
+   - The region of interest (ROI) is extracted as the upper 48×512 portion of the normalized iris, corresponding to the region closest to the pupil (as described by the authors of the paper).
+   - This is calculated by going through each kernel (gabor filter run for every channel) and each filter is applied to the ROI to obtain a magnitude response image.
+   - The ROI is divided into 8×8 pixel blocks. For each block, two statistical measures are computed:
+       - Mean (m) = average intensity of the filtered magnitude.
+       - Average Absolute Deviation (sigma) = texture variability within the block.
+   - Take the statistics for each block and concatenate across all filters to form a single 1D feature vector representing the iris (the output).
+   - The final feature vector is normalized to help improve matching performance (to standardize scales).
+   - This output provides distinctive features of an iris image to use for further processing and classification.
 
 5. **Iris Matching**  
    - Uses **Linear Discriminant Analysis (LDA)** for dimensionality reduction and improved class separability.  
