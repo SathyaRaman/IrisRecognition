@@ -54,7 +54,7 @@ The main steps of the pipeline are:
    - complete_rotations: returns a list of rotated images to account for eye rotation. Uses circular horizontal shifts for rotation invariance.
    - load_iris_images: helps process the input data from the CASIA database by iterating through the directory and returning sorted paths to each image.
   
-**Iris Recognition (main functionn)**
+**Iris Recognition (main function)**
    - The main function of the code.
    - Calls the functions definind in the above steps (localization, image enhancement, feature extraction, iris matching, performance evaluation).
    - Splits dataset into training and test data (session 1 / folder 1 = train and session 2 / folder 2 = test).
