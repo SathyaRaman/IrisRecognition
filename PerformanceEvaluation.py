@@ -74,6 +74,16 @@ def CRR_Result(y_test, y_pred, X_train, y_train, X_test_groups):
 
 
 def ROC_Result(all_distances, y_test, class_labels, metrics):
+    """
+    Computes and visualizes Correct Recognition Rate (CRR) results.
+    Generates Table 4 and Figure 11 from the paper.
+    
+    Parameters:
+    - all_distances: distance from each eye to the closest center per metric
+    - y_test: true labels for test set
+    - class_labels: distances calculated for test samples
+    - metrics: distance measures we want included, currently set to only cosine in main, can include l1 and l2 as well
+    """
     print("\nTable 4: False Match and False Non-match Rates with Paper Thresholds")
     paper_thresholds = [0.446, 0.472, 0.502]
 
