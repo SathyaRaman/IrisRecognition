@@ -56,19 +56,18 @@ The main steps of the pipeline are:
   
 **Iris Recognition (main functionn)**
    - The main function of the code.
-   - Calls the other functions (localization, image enhancement, feature extraction, iris matching, performance evaluation).
+   - Calls the functions definind in the above steps (localization, image enhancement, feature extraction, iris matching, performance evaluation).
    - Splits dataset into training and test data (session 1 / folder 1 = train and session 2 / folder 2 = test).
    - Calls the function pipeline in order for training and test images.
    - Calls rotation function to rotate images when performing matching on the test dataset only.
    - There are no returns, but outputs CRR and ROC results in table and graph format after calling.
-
 ---
 
 ### Limitations
-- **Computational cost**: Running the pipeline on multiple rotations per image makes it slower than ideal.  
-- **Robustness to occlusions**: Eyelashes, eyelids, or reflections can still mess with iris localization and feature extraction.  
-- **Fixed block size in feature extraction**: Using 8×8 blocks might miss some important texture details in irises that have unusual patterns.  
-- **Dataset-specific tuning**: Right now, the system is set up for CASIA-Iris V1 and might need adjustments for other datasets.  
+- Running the pipeline on multiple rotations per image improves rotation invariance but increases runtime. In this approach, each test image is expanded into seven rotated versions, all of which pass through the full iris matching process. For each rotation, the system computes the distance to every class center across all metrics, and then selects the smallest (best) distance as the final score. This effectively increases the workload by a factor of 7× in the test dataset, making the process computationally expensive and slowing performance.
+- Eyelashes, eyelids, or reflections can affect iris localization and feature extraction by occluding the iris and pupil. This affects localization (and further downstream tasks) as this functions goal is to detect the pupil and iris boundaries, potentially causing important parts of the image to be missing or obscured. This affects how identifying the feature vector generated in feature extraction is and thus lowering recognition accuracy. 
+- In the feature extraction stage, the normalized iris region is divided into 8×8 pixel blocks to compute the mean and average absolute deviation. This can cause over-smoothing or miss texture in the image, especially in irises with detailed patterns. While this implementation is faithful to the paper's methodology, using a more adaptive block-size could capture these variations and could be explored in further iterations of this project.
+- Right now, the system is set up for CASIA-Iris V1 and might need adjustments for other datasets. Specific parameters such as the region of interest and kernel size are tuned to improve performance when identifying irises from this dataset and with respect to the papers definitions. Applying this recognition system to other datasets may require re-tuning these parameters and re-training the model to accommodate differences in image resolution, lighting conditions, and the contrast between the pupil and iris.
 
 ### Potential Improvements
 - Explore **deep learning-based feature extraction** to improve accuracy and make the system more robust to variations in iris patterns.  
