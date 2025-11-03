@@ -81,7 +81,7 @@ The main steps of the pipeline are:
 - Right now, the system is set up for CASIA-Iris V1 and might need adjustments for other datasets. Specific parameters such as the region of interest and kernel size are tuned to improve performance when identifying irises from this dataset and with respect to the papers definitions. Applying this recognition system to other datasets may require re-tuning these parameters and re-training the model to accommodate differences in image resolution, lighting conditions, and the contrast between the pupil and iris.
 
 ### Potential Improvements
-- Since there have been major advances in deep learning since 2003, we could Explore **deep learning-based feature extraction** to improve accuracy and make the system more robust to variations in iris patterns or consider using attention mechanisms so the model focuses on the most informative parts of the iris.  
+- Since there have been major advances in deep learning since 2003, we could Explore deep learning-based feature extraction to improve accuracy and make the system more robust to variations in iris patterns or consider using attention mechanisms so the model focuses on the most informative parts of the iris.  
 - Add automatic handling for failed localizations, so images where the pupil/iris detection fails are caught and managed without manual skipping.  
 - Since Ma did not have access to modern GPUs, we could make the pipeline faster and more efficient by parallelizing feature extraction and matching across multiple GPU cores.
 - We could also reduce the number of rotations we check for each test image, maybe by using a smarter rotation estimation method, so the system doesn’t have to compute distances for all seven versions every time.
