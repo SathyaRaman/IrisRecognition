@@ -51,13 +51,13 @@ def IrisRecognition(dataset_path):
 
     print(f"Processing image: {img_path}")
 
-    #parameters for rottation augmentation
+    #parameters for rotation augmentation
     initial_angles = [-9, -6, -3, 0, 3, 6, 9] #degrees for rotation invariance
     #training and testing arrays
     X_train, y_train = [], []
     X_test_groups, y_test = [], []
 
-    #step 1: loop through each person's folder to build datsets
+    #step 1: loop through each person's folder to build datasets
     for eye_id in eyes:
       label = eye_id #this is the label for this person
 
@@ -112,7 +112,6 @@ def IrisRecognition(dataset_path):
 
           #Run step 3: Image Enhancement
           enhanced_img = image_enhancement(rotation)
-          print(f"enhanced")
         #   plt.imshow(output_vis)
         #   plt.show()
 
