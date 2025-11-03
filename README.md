@@ -60,9 +60,9 @@ The main steps of the pipeline are:
          - For each test sample, pulls the genuine score (distance to its own class center) and impostor scores (distances to all other class centers).
          - FMR = % impostor scores ≤ threshold
          - FNMR = % genuine scores > threshold
-      - For table 4, outputs the FMR and FNMR at pre-defined thresholds pre-selected to represent performance of the recognition system.
-      - For table 11, plots the FMR and FNMR on the x and y axis respectively. Uses base 10 to represent the labels on the x-axis as shown in the paper. 
-   - All tables and figures are automatically saved as images.
+      - For table 4, outputs the FMR and FNMR at pre-defined thresholds selected to represent performance of the recognition system.
+         - For table 11, plots the FMR and FNMR on the x and y axis respectively for a selected handful of thresholds. Uses base 10 to represent the labels on the x-axis as shown in the paper. 
+      - All tables and figures are automatically saved as images.
   
 **Helper Functions**
    - PreProcessing.py defines helper functions to run the pipeline.
