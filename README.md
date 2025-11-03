@@ -59,7 +59,7 @@ The main steps of the pipeline are:
 3. ImageEnhancement: ssd2184
 4. Feature Extraction: sr4213
 5. Iris Matching: sr4213
-6. Performance Evaluation: sr4213, ssd2184
+6. Performance Evaluation: sr4213 & ssd2184
 7. Iris Recognition main function: sr4213 & ag5003
 8. Code Integration: ag5003
 
