@@ -53,7 +53,7 @@ The main steps of the pipeline are:
   
 8. **Iris Recognition main functionn**
    - The main function of the code.
-   - Calls the other functions (localization, image enhancement, feature extraction, iris matching, performance evaluation.
+   - Calls the other functions (localization, image enhancement, feature extraction, iris matching, performance evaluation).
    - Splits dataset into training and test data (session 1 / folder 1 = train and session 2 / folder 2 = test).
    - Calls the function pipeline in order for training and test images.
    - Calls rotation function to rotate images when performing matching on the test dataset only.
