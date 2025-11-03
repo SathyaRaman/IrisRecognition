@@ -21,9 +21,11 @@ The main steps of the pipeline are:
    - Produces a fixed-size normalized iris image suitable for feature extraction.  
 
 **Image Enhancement**  
-   - Applies **CLAHE (Contrast Limited Adaptive Histogram Equalization)** for contrast enhancement.  
-   - Performs median filtering to reduce noise and suppress eyelashes.  
-   - Ensures robust normalization of intensity values.  
+   - Applies **CLAHE (Contrast Limited Adaptive Histogram Equalization)** for contrast enhancement.
+   - Does median filtering to reduce noise and lessen obstruction by the eyelashes.  
+   - Clips extreme pixel values.
+   - Rescales pixel intensities to the full 0–255 range for consistent brightness and contrast.
+   - Returns the enhanced grayscale image ready for feature extraction.
 
 **Feature Extraction**  
    - Implements **Ma et al.'s feature extraction procedure** after the generation of a normalized and enhanced iris image.
