@@ -5,7 +5,7 @@ This project implements an **iris recognition pipeline** inspired by Ma et al. (
 
 The main steps of the pipeline are:
 
-1. **Iris Localization**  
+**Iris Localization**  
    - Detects the **pupil and iris boundaries** using a robust double-circle approach with refinement.  
    - Inspired by:  
      - [Ma et al., PAMI 2003](https://cse.msu.edu/~rossarun/BiometricsTextBook/Papers/Iris/Ma_IrisTexture_PAMI03.pdf)  
@@ -13,16 +13,16 @@ The main steps of the pipeline are:
      - [Additional reference: MDPI Sensors, 2023](https://www.mdpi.com/1424-8220/23/4/2238)  
    - Output: pupil circle `(x, y, r)` and iris circle `(x, y, r)`  
 
-2. **Iris Normalization**  
+**Iris Normalization**  
    - Maps the iris from Cartesian coordinates to polar coordinates using **Daugman's Rubber Sheet Model**.  
    - Produces a fixed-size normalized iris image suitable for feature extraction.  
 
-3. **Image Enhancement**  
+**Image Enhancement**  
    - Applies **CLAHE (Contrast Limited Adaptive Histogram Equalization)** for contrast enhancement.  
    - Performs median filtering to reduce noise and suppress eyelashes.  
    - Ensures robust normalization of intensity values.  
 
-4. **Feature Extraction**  
+**Feature Extraction**  
    - Implements **Ma et al.'s feature extraction procedure** after the generation of a normalized and enhanced iris image.
    - Run two different spatial filters with different (delta x, delta y) values, (3, 1.5) and (4.5, 1.5)
    - Use the defined filter created by the paper to generated a modified Gabor filter with modulating sinusoidal function.
@@ -36,7 +36,7 @@ The main steps of the pipeline are:
    - The final feature vector is normalized to help improve matching performance (to standardize scales).
    - This output provides distinctive features of an iris image to use for further processing and classification.
 
-5. **Iris Matching**
+**Iris Matching**
    - Project features using Fisher Linear Discriminant Analysis (LDA) and then perform nearest-center classification under multiple distance metrics.
    - LDA is also performed for a variety of dimensions so that the CRR curve can be calculated across dimensions later. These were chosen from reading the curve on the paper and adding several more values in between for a smoother curve.
    - The distance measures used were the l1 distance (sum of absolute differences (city block distances), the l2 distance (squared euclidian norm), and cosine similarity.
@@ -44,17 +44,17 @@ The main steps of the pipeline are:
    - Computes features for 7 rotated versions of each test iris and selects the minimum distance.
    - Returns the predicted values for every single distance measure and also other intermeediate results like the actual class centers and distances for each metric so they can be used for the calculations for the CRR and ROC curves.
 
-7. **Performance Evaluation**  
+**Performance Evaluation**  
    - **Correct Recognition Rate (CRR)**: shows identification performance per distance metric.  
    - **ROC Curves** and **Equal Error Rate (EER)**: shows verification performance.  
    - All tables and figures are automatically saved as images.
   
-8. **PreProcessing.py**
-   - Defines helper functions to run the pipeline.
+**Helper Functions**
+   - PreProcessing.py defines helper functions to run the pipeline.
    - complete_rotations: returns a list of rotated images to account for eye rotation. Uses circular horizontal shifts for rotation invariance.
    - load_iris_images: helps process the input data from the CASIA database by iterating through the directory and returning sorted paths to each image.
   
-9. **Iris Recognition main functionn**
+**Iris Recognition (main functionn)**
    - The main function of the code.
    - Calls the other functions (localization, image enhancement, feature extraction, iris matching, performance evaluation).
    - Splits dataset into training and test data (session 1 / folder 1 = train and session 2 / folder 2 = test).
