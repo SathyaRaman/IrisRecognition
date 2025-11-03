@@ -36,22 +36,25 @@ The main steps of the pipeline are:
    - The final feature vector is normalized to help improve matching performance (to standardize scales).
    - This output provides distinctive features of an iris image to use for further processing and classification.
 
-5. **Iris Matching**  
-   - Uses **Linear Discriminant Analysis (LDA)** for dimensionality reduction and improved class separability.  
-   - Matches features with a **nearest-center classifier** using multiple distance metrics (`l1`, `l2`, `cosine`).  
-   - Rotation-invariant: computes features for 7 rotated versions of each test iris and selects the minimum distance.  
+5. **Iris Matching**
+   - Project features using Fisher Linear Discriminant Analysis (LDA) and then perform nearest-center classification under multiple distance metrics.
+   - LDA is also performed for a variety of dimensions so that the CRR curve can be calculated across dimensions later. These were chosen from reading the curve on the paper and adding several more values in between for a smoother curve.
+   - The distance measures used were the l1 distance (sum of absolute differences (city block distances), the l2 distance (squared euclidian norm), and cosine similarity.
+   - The smallest or best distance tells us the predicted y value or identity the iris belongs to.
+   - Computes features for 7 rotated versions of each test iris and selects the minimum distance.
+   - Returns the predicted values for every single distance measure and also other intermeediate results like the actual class centers and distances for each metric so they can be used for the calculations for the CRR and ROC curves.
 
-6. **Performance Evaluation**  
+7. **Performance Evaluation**  
    - **Correct Recognition Rate (CRR)**: shows identification performance per distance metric.  
    - **ROC Curves** and **Equal Error Rate (EER)**: shows verification performance.  
    - All tables and figures are automatically saved as images.
   
-7. **PreProcessing.py**
+8. **PreProcessing.py**
    - Defines helper functions to run the pipeline.
    - complete_rotations: returns a list of rotated images to account for eye rotation. Uses circular horizontal shifts for rotation invariance.
    - load_iris_images: helps process the input data from the CASIA database by iterating through the directory and returning sorted paths to each image.
   
-8. **Iris Recognition main functionn**
+9. **Iris Recognition main functionn**
    - The main function of the code.
    - Calls the other functions (localization, image enhancement, feature extraction, iris matching, performance evaluation).
    - Splits dataset into training and test data (session 1 / folder 1 = train and session 2 / folder 2 = test).
