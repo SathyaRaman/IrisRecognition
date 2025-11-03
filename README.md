@@ -45,8 +45,18 @@ The main steps of the pipeline are:
    - Returns the predicted values for every single distance measure and also other intermeediate results like the actual class centers and distances for each metric so they can be used for the calculations for the CRR and ROC curves.
 
 **Performance Evaluation**  
-   - **Correct Recognition Rate (CRR)**: shows identification performance per distance metric.  
-   - **ROC Curves** and **Equal Error Rate (EER)**: shows verification performance.  
+   - Helps to recreate figures 3, 4, 10, and 11 from the Ma paper.
+   - Figures 3 and 10 include the **Correct Recognition Rate (CRR)**, which explains the accuracy of the iris recogniton performance per distance metric.
+      - CRR = (#correct predictions / #test samples}​ × 100%
+      - For table 3, just reports the CRR for each distance measure. 
+      - For figure 11, iterates over a list of LDA dimensions, re-runs iris_matching with each lda_dim, computes CRR per metric, and plots CRR curves vs. dimensions.
+   - Figures 4 and 11 visualize the **ROC: Receiver Operating Characteristic Curve**, showing verification performance.
+      - Computes False Match Rate (FMR) and False Non-Match Rate (FNMR) at specified thresholds using the intermediate returns from iris matching.
+         - For each test sample, pulls the genuine score (distance to its own class center) and impostor scores (distances to all other class centers).
+         - FMR = % impostor scores ≤ threshold
+         - FNMR = % genuine scores > threshold
+      - For table 4, outputs the FMR and FNMR at pre-defined thresholds pre-selected to represent performance of the recognition system.
+      - For table 11, plots the FMR and FNMR on the x and y axis respectively. Uses base 10 to represent the labels on the x-axis as shown in the paper. 
    - All tables and figures are automatically saved as images.
   
 **Helper Functions**
