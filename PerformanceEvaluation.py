@@ -73,70 +73,72 @@ def CRR_Result(y_test, y_pred, X_train, y_train, X_test_groups):
     plt.close()
 
 
-def ROC_Result(all_distances, y_test, class_labels, metrics=("l1", "l2", "cosine")):
-    """
-    Computes and visualizes ROC (Verification Mode) results.
-    Generates Table 4 and Figure 11 from the paper.
-    
-    Parameters:
-    - all_distances: dictionary of distances per metric (from iris_matching)
-    - y_test: true labels for test set
-    - class_labels: list of unique classes in training set
-    - metrics: list of similarity metrics to evaluate
-    """
-    print("\nTable 4: ROC (Verification Mode)")
-    eer_results = []
+def ROC_Result(all_distances, y_test, class_labels, metrics):
+    print("\nTable 4: False Match and False Non-match Rates with Paper Thresholds")
+    paper_thresholds = [0.446, 0.472, 0.502]
 
-    plt.figure(figsize=(7, 5))
-    #iterate over each similarity metric
+    #get thresholds
+    table4_rows = [["Metric", "Threshold", "False Match Rate (%)", "False Non-match Rate (%)"]]
+
+    plt.figure(figsize=(6.5, 4.8))
+
+    #we are just using the cosine metric as the paper did
+    #can add other metrics to input if that is needed
     for metric in metrics:
         D = all_distances[metric]
-        genuine = [] #distances for corrrrect matches
-        impostor = [] #distances for incorrect matches
+        genuine, impostor = [], []
 
-        #calculate genuine and impostor distances
+        #get genuine and impostor distances
         for i, true_label in enumerate(y_test):
-            true_idx = np.where(class_labels == true_label)[0][0]
-            genuine.append(D[i, true_idx])
-            impostor.extend(D[i, np.arange(len(class_labels)) != true_idx])
+            idx = np.where(class_labels == true_label)[0][0]
+            genuine.append(D[i, idx])
+            impostor.extend(D[i, np.arange(len(class_labels)) != idx])
 
         genuine = np.array(genuine)
         impostor = np.array(impostor)
 
-        #thresholds for ROC curve
-        thresholds = np.unique(np.concatenate([genuine, impostor])) 
-        FMR = [(impostor <= t).mean() for t in thresholds] #false match rate
-        FNMR = [(genuine > t).mean() for t in thresholds] #false non-match rate
+        #compute ROC curve for visualization
+        #calculate the FMR and FNMR using imposter and genuine distances
+        #the below is for the continuous curve in figure 11
+        thresholds = np.linspace(genuine.min(), impostor.max(), 200)
+        FMR = [(impostor <= t).mean() * 100 for t in thresholds]
+        FNMR = [(genuine > t).mean() * 100 for t in thresholds]
+        plt.plot(FMR, FNMR, label=metric.upper())
 
-        #computing ERR
-        eer_idx = np.argmin(np.abs(np.array(FMR) - np.array(FNMR)))
-        eer = 0.5 * (FMR[eer_idx] + FNMR[eer_idx])
-        eer_results.append((metric.upper(), eer * 100))
+        #compute FMR/FNMR at the paper thresholds (0.446, 0.472, 0.502)  
+        for t in paper_thresholds:
+            fmr = (impostor <= t).mean() * 100
+            fnmr = (genuine > t).mean() * 100
+            table4_rows.append([
+                metric.upper(),
+                f"{t:.3f}",
+                f"{fmr:.3f}",
+                f"{fnmr:.3f}"
+            ])
 
-        print(f"{metric.upper():<8} | Equal Error Rate (EER): {eer*100:.2f}%")
-        plt.plot(FMR, FNMR, label=f"{metric.upper()} (EER={eer*100:.2f}%)")
+    #print table
+    for row in table4_rows:
+        print("\t".join(row))
 
-    #save Table 4 as image
-    fig, ax = plt.subplots(figsize=(6, 2))
+    #save table 4 visualization
+    fig, ax = plt.subplots(figsize=(7, 3))
     ax.axis('off')
-    table_data = [["Similarity Measure", "Equal Error Rate (EER %)"]] + [
-        [m, f"{v:.2f}"] for m, v in eer_results
-    ]
-    table = ax.table(cellText=table_data, loc='center', cellLoc='center', colLoc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1.2, 1.4)
-    plt.title("Table 4: ROC (Verification Mode)", fontsize=10)
+    tbl = ax.table(cellText=table4_rows, loc='center', cellLoc='center')
+    tbl.auto_set_font_size(False)
+    tbl.set_fontsize(9)
+    ax.set_title("Table 4: FMR / FNMR at Paper Thresholds", fontsize=10, pad=8)
     plt.tight_layout()
-    plt.savefig("Table4_ROC_EER.png", dpi=300)
-    plt.close()
+    plt.savefig("Table4_PaperThresholds.png", dpi=300)
+    plt.close(fig)
 
-    #Figure 11: ROC Curves
-    plt.xlabel("False Acceptance Rate (FAR / FMR)")
-    plt.ylabel("False Rejection Rate (FRR / FNMR)")
-    plt.title("Figure 11: ROC Curves for Verification Mode")
+    #save ROC Curve (Figure 11)
+    plt.xlabel("False Match Rate (%)")
+    plt.ylabel("False Non-match Rate (%)")
+    plt.title("Figure 11: ROC Curves (Verification Mode)")
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
+    plt.savefig("Figure11_ROC_Curves_PaperThresholds.png", dpi=300)
+    plt.close()
     plt.savefig("Figure11_ROC_Curves.png", dpi=300)
     plt.close()
