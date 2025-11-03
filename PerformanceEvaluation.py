@@ -110,6 +110,7 @@ def ROC_Result(all_distances, y_test, class_labels, metrics):
         #if the authorized mean is higher than imposter mean, then the metric is similarity (cosine), else L1 and L2
         similarity = np.mean(authorized) > np.mean(impostor) 
         
+        
         # automatically select 3 thresholds
         if similarity: #for cosine similarity
             low = np.percentile(impostor, 10) #low threshold is for the 10th percentile of imposters
@@ -119,11 +120,12 @@ def ROC_Result(all_distances, y_test, class_labels, metrics):
             low = np.percentile(authorized, 90)  #low threshold is for 90th percentile of authorized
             mid = (authorized.mean() + impostor.mean()) / 2  #the mean of the authorized and importers
             high = np.percentile(impostor, 10) # high threshold is for the 10th percentile of imposters
-
+        
+        thresholds = sorted([low, mid, high])
+        
         #compute ROC curve for visualization
         #calculate the FMR and FNMR using imposter and authorized distances
         #the below is for the continuous curve in figure 11
-        thresholds = sorted([low, mid, high])
         FMR_list, FNMR_list = [], []
         for t in thresholds:
             if similarity: #for cosine similarity 
@@ -142,8 +144,42 @@ def ROC_Result(all_distances, y_test, class_labels, metrics):
                 f"{fmr:.3f}",
                 f"{fnmr:.3f}"
             ])
+
+        all_scores = np.concatenate([authorized, impostor])
+        #curve_thresholds = np.unique(all_scores)  # dense thresholds for smooth curve
+        #choose a several thresholds for a curve like in the paper 
+        #choosing high values to get more points in the low FMR region to exemplify performance
+        curve_thresholds = np.quantile(all_scores, [0.0001, 0.00002, 0.01, 0.10, 0.25, 0.35, 0.5, 0.64, 0.70, 0.79, 0.80,0.85, 0.9, 0.98, 0.9999, 0.9995, 0.999, 0.9985, 0.998, 0.997,
+                                    0.996, 0.995, 0.994, 0.993, 0.992, 0.991,
+                                    0.99, 0.985, 0.98, 0.97, 0.95, 0.90])
+        #build a smooth curve using ALL thresholds
+        #calculate the FMR and FNMR using imposter and authorized distances for every threshold
+        FMR_curve, FNMR_curve = [], []
+        for t in curve_thresholds:
+            if similarity:  # cosine
+                fmr = (impostor >= t).mean() * 100.0
+                fnmr = (authorized <  t).mean() * 100.0
+            else:           # L1/L2
+                fmr = (impostor <= t).mean() * 100.0
+                fnmr = (authorized >  t).mean() * 100.0
+            FMR_curve.append(fmr)
+            FNMR_curve.append(fnmr)
+
+
+
+        #sort by FMR and clip zeros for log-x plotting
+        FMR_curve = np.asarray(FMR_curve)
+        FNMR_curve = np.asarray(FNMR_curve)
+        order = np.argsort(FMR_curve)
+        FMR_plot = FMR_curve[order] #np.clip(FMR_curve[order], 1e-3, None)
+        FNMR_plot = FNMR_curve[order]
+        
         #plot the ROC curve
-        plt.plot(FMR_list, FNMR_list, marker='o', lw=1.8, label=f"{metric.upper()} (ROC)")
+        plt.plot(FMR_plot, FNMR_plot, marker='o', lw=1.8, label=f"{metric.upper()} (ROC)"
+                 )
+        plt.ylim(0, 20) 
+        #can add steps to match paper style more closely
+        #drawstyle='steps-post'
 
     #print table
     print("Metric Threshold FMR(%) FNMR(%)")
