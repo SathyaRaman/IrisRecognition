@@ -39,7 +39,7 @@ def feature_extraction(enhanced_iris):
 
   #generate grid for kernel coordinates
   y, x = np.mgrid[-r:r+1, -r:r+1].astype(np.float32)
-  #store filter kernels fo each channel
+  #store filter kernels for each channel
   kernels = []
 
   #iterate through every channel to calculate the kernel for channel 1 and 2
